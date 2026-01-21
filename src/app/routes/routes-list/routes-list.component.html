@@ -1,0 +1,94 @@
+<div class="container">
+    <div class="">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 2em;">
+            <h1>Rutas</h1>
+            <button class="btn btn-primary" (click)="createRoute()">Nueva Ruta</button>
+        </div>
+
+        <div class="filters">
+            <input type="number" placeholder="ID de unidad" [(ngModel)]="vehicleFilter" />
+
+            <select [(ngModel)]="statusFilter">
+                <option value="">Todos los estados</option>
+                <option value="assigned">Asignada</option>
+                <option value="in_progress">En ruta</option>
+                <option value="completed">Completada</option>
+            </select>
+
+            <button class="btn btn-primary" (click)="aplicarFiltros()">
+                Filtrar
+            </button>
+
+            <button class="btn btn-secondary" (click)="limpiarFiltros()">
+                Limpiar
+            </button>
+        </div>
+
+    </div>
+
+    <table class="table" *ngIf="routes.length > 0">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Vehículo</th>
+                <th>Origen</th>
+                <th>Destino</th>
+                <th>Status</th>
+                <th>Asignada</th>
+                <th>Cambio de estatus</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let route of routes">
+                <td>{{ route.id }}</td>
+                <td>{{ route.vehicleId }}</td>
+                <td>{{ route.origin }}</td>
+                <td>{{ route.destination }}</td>
+                <td>
+                    <span class="status-badge" [ngClass]="{
+      'status-asignada': route.status === 'assigned',
+      'status-progreso': route.status === 'in_progress',
+      'status-completada': route.status === 'completed'
+    }">
+                        {{ route.status === 'assigned' ? 'Asignada' :
+                        route.status === 'in_progress' ? 'En ruta' :
+                        'Completada' }}
+                    </span>
+                </td>
+                <td>{{ route.assignedAt | date:'dd/MM/yyyy HH:mm' }}</td>
+                <td>
+                    <button *ngIf="route.status === 'assigned'" class="btn btn-warning btn-sm"
+                        (click)="cambiarStatus(route)">
+                        Iniciar
+                    </button>
+                    <button *ngIf="route.status === 'in_progress'" class="btn btn-success btn-sm"
+                        (click)="routeSeleccionada = route.id">
+                        Completar
+                    </button>
+                    <button *ngIf="route.status === 'completed'" class="btn btn-secondary btn-sm" disabled>
+                        Ruta completada
+                    </button>
+
+                </td>
+
+            </tr>
+        </tbody>
+    </table>
+
+    <app-route-complete *ngIf="routeSeleccionada" [routeId]="routeSeleccionada" (completed)="onRutaCompletada()">
+    </app-route-complete>
+
+
+
+    <div *ngIf="skip > 0 || routes.length === limit" style="display: flex; justify-content: space-between; margin-top: 20px;">
+
+        <button class="btn btn-primary" (click)="anterior()" [disabled]="!puedeIrAtras()">
+            Anterior
+        </button>
+
+        <button class="btn btn-primary" (click)="siguiente()" [disabled]="routes.length < limit">
+            Siguiente
+        </button>
+
+    </div>
+</div>

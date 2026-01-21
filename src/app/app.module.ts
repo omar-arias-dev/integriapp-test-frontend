@@ -9,6 +9,7 @@ const routes: Routes = [
   { path: '', redirectTo: '/usuarios', pathMatch: 'full' },
   { path: 'usuarios', loadChildren: () => import('./usuarios/usuarios.module').then(m => m.UsuariosModule) },
   { path: 'unidades', loadChildren: () => import('./unidades/unidades.module').then(m => m.UnidadesModule) },
+  { path: 'routes', loadChildren: () => import('./routes/routes.module').then(m => m.RoutesModule) },
   { path: '**', redirectTo: '/usuarios' }
 ];
 

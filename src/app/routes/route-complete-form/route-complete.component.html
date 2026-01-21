@@ -1,0 +1,52 @@
+<div class="card mt-3">
+  <div class="card-body">
+
+    <h5 class="mb-3">Completar Ruta</h5>
+
+    <div *ngIf="mensaje"
+         class="alert"
+         [ngClass]="{
+           'alert-success': tipoMensaje === 'success',
+           'alert-danger': tipoMensaje === 'danger'
+         }">
+      {{ mensaje }}
+    </div>
+
+    <form [formGroup]="completeForm" (ngSubmit)="completar()">
+
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Distancia (km)</label>
+          <input type="number" class="form-control" formControlName="distance_km">
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Combustible</label>
+          <input type="number" class="form-control" formControlName="fuel_consumed">
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Duración (min)</label>
+          <input type="number" class="form-control" formControlName="duration_minutes">
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Notas</label>
+        <textarea class="form-control"
+                  rows="3"
+                  formControlName="notes"></textarea>
+      </div>
+
+      <div class="text-end">
+        <button type="submit"
+                class="btn btn-success"
+                [disabled]="completeForm.invalid">
+          Completar Ruta
+        </button>
+      </div>
+
+    </form>
+
+  </div>
+</div>
