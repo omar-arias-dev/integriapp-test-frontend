@@ -1,0 +1,40 @@
+<div class="container mt-4">
+    <h1>Rendimiento</h1>
+
+    <table class="table table-striped" *ngIf="performances.length > 0">
+        <thead>
+            <tr>
+                <th>Ruta</th>
+                <th>Distancia (km)</th>
+                <th>Combustible (litros)</th>
+                <th>Duración (minutos)</th>
+                <th>Fecha inicio</th>
+                <th>Fecha final</th>
+                <th>Notas</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let p of performances">
+                <td>{{ p.routeId }}</td>
+                <td>{{ p.distanceKm }}</td>
+                <td>{{ p.fuelConsumed }}</td>
+                <td>{{ p.duration }} minutos</td>
+                <td>{{ p.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+                <td>
+                    {{ getFechaFinal(p) | date:'dd/MM/yyyy HH:mm' }}
+                </td>
+                <td>{{ p.notes }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div style="display:flex; justify-content:space-between; margin-top:20px;">
+        <button class="btn btn-primary" (click)="anterior()" [disabled]="!puedeIrAtras()">
+            Anterior
+        </button>
+
+        <button class="btn btn-primary" (click)="siguiente()" [disabled]="performances.length < limit">
+            Siguiente
+        </button>
+    </div>
+</div>
