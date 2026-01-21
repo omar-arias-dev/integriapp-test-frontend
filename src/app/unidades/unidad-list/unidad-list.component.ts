@@ -14,18 +14,27 @@ export class UnidadListComponent implements OnInit, OnDestroy {
   private subscription?: Subscription;
   mensaje: string = '';
   tipoMensaje: 'success' | 'danger' = 'success';
+  loading = false;
 
   constructor(
     private unidadService: UnidadService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
-    this.subscription = this.unidadService.getUnidades().subscribe(
-      unidades => {
-        this.unidades = unidades;
-      }
-    );
+    this.loading = true;
+    this.subscription = this.unidadService
+      .getUnidades()
+      .subscribe({
+        next: unidades => {
+          this.unidades = unidades;
+          this.loading = false;
+        },
+        error: () => {
+          this.loading = false;
+        }
+      });
+    this.unidadService.loadUnidades();
   }
 
   ngOnDestroy(): void {
@@ -41,18 +50,20 @@ export class UnidadListComponent implements OnInit, OnDestroy {
   }
 
   eliminarUnidad(id: number): void {
-    if (confirm('¿Está seguro de que desea eliminar esta unidad?')) {
-      const unidad = this.unidadService.getUnidadById(id);
-      if (unidad) {
-        const eliminado = this.unidadService.eliminarUnidad(id);
-        if (eliminado) {
-          this.mostrarMensaje(`Unidad "${unidad.placa}" eliminada correctamente`, 'success');
-        } else {
-          this.mostrarMensaje('Error al eliminar la unidad', 'danger');
-        }
-      }
+    if (!confirm('¿Está seguro de que desea eliminar esta unidad?')) {
+      return;
     }
+
+    this.unidadService.desactivarUnidad(id).subscribe({
+      next: () => {
+        this.mostrarMensaje('Unidad desactivada correctamente', 'success');
+      },
+      error: () => {
+        this.mostrarMensaje('Error al desactivar la unidad', 'danger');
+      }
+    });
   }
+
 
   private mostrarMensaje(mensaje: string, tipo: 'success' | 'danger'): void {
     this.mensaje = mensaje;
@@ -60,5 +71,21 @@ export class UnidadListComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.mensaje = '';
     }, 3000);
+  }
+
+  siguiente(): void {
+    this.unidadService.nextPage();
+  }
+
+  puedeIrAdelante(): boolean {
+    return this.unidades.length === 10;
+  }
+
+  anterior(): void {
+    this.unidadService.prevPage();
+  }
+
+  puedeIrAtras(): boolean {
+    return this.unidadService.canGoBack();
   }
 }

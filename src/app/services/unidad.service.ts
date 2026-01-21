@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, combineLatest } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 import { Unidad } from '../models/unidad.model';
-import { Usuario } from '../models/usuario.model';
 import { UsuarioService } from './usuario.service';
+import { VehicleApiService } from './vehicle.service';
+import { VehicleMapper } from '../mappers/vehicleToUnidad.mapper';
 
 @Injectable({
   providedIn: 'root'
@@ -12,34 +13,44 @@ export class UnidadService {
   private unidades: Unidad[] = [];
   private unidadesSubject = new BehaviorSubject<Unidad[]>([]);
   public unidades$ = this.unidadesSubject.asObservable();
-  private nextId = 1;
+  private skip = 0;
+  private limit = 10;
 
-  constructor(private usuarioService: UsuarioService) {
+  constructor(
+    private vehicleApi: VehicleApiService,
+    private usuarioService: UsuarioService,
+  ) {
     // Inicializar con algunos datos de ejemplo
     this.loadInitialData();
   }
 
+  loadUnidades(activeOnly = true): void {
+    this.vehicleApi
+      .getVehicles(this.skip, this.limit, activeOnly)
+      .pipe(
+        map(vehicles => vehicles.map(VehicleMapper.toUnidad)),
+        tap(unidades => this.unidadesSubject.next(unidades))
+      )
+      .subscribe();
+  }
+
+  nextPage(activeOnly = true): void {
+    this.skip += this.limit;
+    this.loadUnidades(activeOnly);
+  }
+
+  prevPage(): void {
+    if (this.skip === 0) return;
+    this.skip -= this.limit;
+    this.loadUnidades();
+  }
+
+  canGoBack(): boolean {
+    return this.skip > 0;
+  }
+
   private loadInitialData(): void {
-    const initialData: Unidad[] = [
-      {
-        id: this.nextId++,
-        placa: 'ABC-123',
-        marca: 'Toyota',
-        modelo: 'Corolla',
-        anio: 2020,
-        usuarioId: 1,
-        fechaCreacion: new Date()
-      },
-      {
-        id: this.nextId++,
-        placa: 'XYZ-789',
-        marca: 'Honda',
-        modelo: 'Civic',
-        anio: 2021,
-        usuarioId: 2,
-        fechaCreacion: new Date()
-      }
-    ];
+    const initialData: Unidad[] = [];
     this.unidades = initialData;
     this.unidadesSubject.next([...this.unidades]);
   }
@@ -58,29 +69,31 @@ export class UnidadService {
     );
   }
 
-  getUnidadById(id: number): Unidad | undefined {
-    return this.unidades.find(u => u.id === id);
+  getUnidadById(id: number): Observable<Unidad> {
+    return this.vehicleApi.findById(id).pipe(
+      map(vehicle => VehicleMapper.toUnidad(vehicle))
+    );
   }
 
-  crearUnidad(unidad: Omit<Unidad, 'id' | 'fechaCreacion' | 'usuario'>): Unidad {
-    const nuevaUnidad: Unidad = {
-      ...unidad,
-      id: this.nextId++,
-      fechaCreacion: new Date()
-    };
-    this.unidades.push(nuevaUnidad);
-    this.unidadesSubject.next([...this.unidades]);
-    return nuevaUnidad;
+  crearUnidad(unidad: Partial<Unidad>): Observable<void> {
+    const payload = VehicleMapper.toUpdateDto(unidad);
+
+    return this.vehicleApi.create(payload).pipe(
+      tap(() => {
+        this.loadUnidades();
+      }),
+      map(() => void 0)
+    );
   }
 
-  actualizarUnidad(id: number, unidad: Partial<Unidad>): Unidad | null {
-    const index = this.unidades.findIndex(u => u.id === id);
-    if (index === -1) {
-      return null;
-    }
-    this.unidades[index] = { ...this.unidades[index], ...unidad };
-    this.unidadesSubject.next([...this.unidades]);
-    return this.unidades[index];
+  actualizarUnidad(id: number, unidad: Partial<Unidad>): Observable<void> {
+    const payload = VehicleMapper.toUpdateDto(unidad);
+    return this.vehicleApi.update(id, payload).pipe(
+      tap(() => {
+        this.loadUnidades();
+      }),
+      map(() => void 0)
+    );
   }
 
   eliminarUnidad(id: number): boolean {
@@ -92,4 +105,16 @@ export class UnidadService {
     this.unidadesSubject.next([...this.unidades]);
     return true;
   }
+
+  desactivarUnidad(id: number): Observable<void> {
+    return this.vehicleApi.deactivate(id).pipe(
+      tap(() => {
+        const nuevasUnidades = this.unidadesSubject.value.filter(
+          unidad => unidad.id !== id
+        );
+        this.unidadesSubject.next(nuevasUnidades);
+      })
+    );
+  }
+
 }

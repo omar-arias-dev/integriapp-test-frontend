@@ -62,47 +62,56 @@ export class UnidadFormComponent implements OnInit, OnDestroy {
   }
 
   cargarUnidad(id: number): void {
-    const unidad = this.unidadService.getUnidadById(id);
-    if (unidad) {
-      this.unidadForm.patchValue({
-        placa: unidad.placa,
-        marca: unidad.marca,
-        modelo: unidad.modelo,
-        anio: unidad.anio,
-        usuarioId: unidad.usuarioId
-      });
-    } else {
-      this.mostrarMensaje('Unidad no encontrada', 'danger');
-      setTimeout(() => {
-        this.router.navigate(['/unidades']);
-      }, 2000);
-    }
+    this.unidadService.getUnidadById(id).subscribe({
+      next: (unidad) => {
+        this.unidadForm.patchValue({
+          placa: unidad.placa,
+          marca: unidad.marca,
+          modelo: unidad.modelo,
+          anio: unidad.anio,
+          usuarioId: unidad.usuarioId
+        });
+      },
+      error: () => {
+        this.mostrarMensaje('Unidad no encontrada', 'danger');
+        setTimeout(() => {
+          this.router.navigate(['/unidades']);
+        }, 2000);
+      }
+    });
   }
+
 
   guardar(): void {
     if (this.unidadForm.valid) {
       const datosUnidad = this.unidadForm.value;
-      
+
       if (this.esEdicion && this.unidadId) {
-        const actualizado = this.unidadService.actualizarUnidad(this.unidadId, datosUnidad);
-        if (actualizado) {
-          this.mostrarMensaje('Unidad actualizada correctamente', 'success');
-          setTimeout(() => {
-            this.router.navigate(['/unidades']);
-          }, 1500);
-        } else {
-          this.mostrarMensaje('Error al actualizar la unidad', 'danger');
-        }
+        this.unidadService
+          .actualizarUnidad(this.unidadId, datosUnidad)
+          .subscribe({
+            next: () => {
+              this.mostrarMensaje('Unidad actualizada correctamente', 'success');
+              setTimeout(() => {
+                this.router.navigate(['/unidades']);
+              }, 1500);
+            },
+            error: () => {
+              this.mostrarMensaje('Error al actualizar la unidad', 'danger');
+            }
+          });
       } else {
-        const creado = this.unidadService.crearUnidad(datosUnidad);
-        if (creado) {
-          this.mostrarMensaje('Unidad creada correctamente', 'success');
-          setTimeout(() => {
-            this.router.navigate(['/unidades']);
-          }, 1500);
-        } else {
-          this.mostrarMensaje('Error al crear la unidad', 'danger');
-        }
+        this.unidadService
+          .crearUnidad(datosUnidad)
+          .subscribe({
+            next: () => {
+              this.mostrarMensaje('Unidad creada correctamente', 'success');
+              setTimeout(() => this.router.navigate(['/unidades']), 1500);
+            },
+            error: () => {
+              this.mostrarMensaje('Error al crear la unidad', 'danger');
+            }
+          });
       }
     } else {
       this.marcarCamposInvalidos();

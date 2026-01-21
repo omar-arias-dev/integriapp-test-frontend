@@ -5,11 +5,12 @@
       <button class="btn btn-primary" (click)="crearUnidad()">Nueva Unidad</button>
     </div>
 
-    <div *ngIf="mensaje" class="alert" [ngClass]="{'alert-success': tipoMensaje === 'success', 'alert-danger': tipoMensaje === 'danger'}">
+    <div *ngIf="mensaje" class="alert"
+      [ngClass]="{'alert-success': tipoMensaje === 'success', 'alert-danger': tipoMensaje === 'danger'}">
       {{ mensaje }}
     </div>
 
-    <div *ngIf="unidades.length === 0" class="empty-state">
+    <div *ngIf="unidades.length === 0 && !puedeIrAtras()" class="empty-state">
       <p>No hay unidades registradas</p>
       <button class="btn btn-primary" (click)="crearUnidad()">Crear primera unidad</button>
     </div>
@@ -40,11 +41,26 @@
           </td>
           <td>{{ unidad.fechaCreacion | date:'dd/MM/yyyy' }}</td>
           <td>
-            <button class="btn btn-secondary" (click)="editarUnidad(unidad.id)" style="margin-right: 5px;">Editar</button>
+            <button class="btn btn-secondary" (click)="editarUnidad(unidad.id)"
+              style="margin-right: 5px;">Editar</button>
             <button class="btn btn-danger" (click)="eliminarUnidad(unidad.id)">Eliminar</button>
           </td>
         </tr>
       </tbody>
     </table>
+
+    <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+
+      <button class="btn btn-primary" (click)="anterior()" [disabled]="!puedeIrAtras()">
+        Anterior
+      </button>
+
+      <button class="btn btn-primary" (click)="siguiente()" [disabled]="!puedeIrAdelante()">
+        Siguiente
+      </button>
+
+    </div>
+
+
   </div>
 </div>
