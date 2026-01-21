@@ -1,70 +1,552 @@
-# Control Transportistas
+# IntegriApp Frontend - Sistema de Gestión de Rutas y Vehículos
 
-Aplicación Angular para la gestión de usuarios y unidades de transporte.
+  
 
-## Características
+Aplicación web desarrollada con **Angular** para la gestión de unidades (vehículos), rutas y análisis de rendimiento.
 
-- **Módulo de Usuarios**: Gestión completa CRUD (Crear, Leer, Actualizar, Eliminar) de usuarios
-- **Módulo de Unidades**: Gestión completa CRUD de unidades con asignación de usuarios
+  
 
-## Estructura del Proyecto
+## 📋 Requisitos Previos
+
+  
+
+Antes de comenzar, asegúrate de tener instalado:
+
+  
+
+-  **Node.js** (versión 18 o superior)
+
+-  **npm** (versión 9 o superior)
+
+-  **Angular CLI** (versión 17 o superior) - Opcional pero recomendado
+
+  
+
+### Verificar instalación
+
+  
+
+```bash
+
+node  --version
+
+npm  --version
+
+ng  version  # Si tienes Angular CLI instalado
 
 ```
+
+  
+
+### Instalar Angular CLI (Opcional)
+
+  
+
+```bash
+
+npm  install  -g  @angular/cli
+
+```
+
+  
+
+## 🚀 Instalación y Configuración
+
+  
+
+### 1. Clonar el repositorio
+
+  
+
+```bash
+
+git  clone <url-del-repositorio>
+
+cd  integriapp-frontend
+
+```
+
+  
+
+### 2. Instalar dependencias
+
+  
+
+```bash
+
+npm  install
+
+```
+
+  
+
+Este comando instalará todas las dependencias necesarias del proyecto definidas en `package.json`.
+
+  
+
+### 3. Configurar la conexión al backend
+
+  
+
+El archivo de configuración se encuentra en `src/environments/`:
+
+  
+
+**Para desarrollo local:**
+
+-  `environment.ts` - Configuración de desarrollo
+
+  
+
+Por defecto, la aplicación apunta a:
+
+```typescript
+
+apiUrl: 'http://localhost:8000'
+
+```
+
+  
+
+>  **⚠️ Importante:** Asegúrate de que el backend esté corriendo en `http://localhost:8000` antes de iniciar el frontend.
+
+  
+
+### 4. Ejecutar la aplicación
+
+  
+
+```bash
+
+npm  start
+
+```
+
+  
+
+O con Angular CLI:
+
+  
+
+```bash
+
+ng  serve
+
+```
+
+  
+
+La aplicación estará disponible en: **http://localhost:4200**
+
+  
+
+### 5. Abrir en el navegador
+
+  
+
+Navega a [http://localhost:4200](http://localhost:4200) y la aplicación se recargará automáticamente si cambias algún archivo fuente.
+
+  
+
+## 📁 Estructura del Proyecto
+
+  
+
+```
+
 src/
+
 ├── app/
-│   ├── models/          # Modelos de datos (Usuario, Unidad)
-│   ├── services/        # Servicios para manejo de datos
-│   ├── usuarios/        # Módulo de usuarios
-│   │   ├── usuario-list/    # Lista de usuarios
-│   │   └── usuario-form/    # Formulario de creación/edición
-│   ├── unidades/        # Módulo de unidades
-│   │   ├── unidad-list/     # Lista de unidades
-│   │   └── unidad-form/     # Formulario de creación/edición
-│   └── app.component.*  # Componente principal
+
+│ ├── dtos/ # Data Transfer Objects
+
+│ ├── mappers/ # Conversores DTO ↔ Model
+
+│ ├── models/ # Modelos de dominio
+
+│ ├── services/ # Servicios compartidos
+
+│ ├── unidades/ # Módulo de Unidades (Vehículos)
+
+│ ├── routes/ # Módulo de Rutas
+
+│ ├── performance/ # Módulo de Rendimiento
+
+│ ├── usuarios/ # Módulo de Usuarios (heredado)
+
+│ ├── app.component.ts
+
+│ ├── app.module.ts
+
+│ └── app-routing.module.ts
+
+├── environments/ # Configuración de entornos
+
+│ ├── environments.ts # Desarrollo
+
+├── index.html
+
 ```
 
-## Instalación
+  
 
-1. Instalar dependencias:
+## 🏗️ Arquitectura y Diseño
+
+  
+
+### Patrón de Capas
+
+  
+
+```
+
+Components (UI/Presentación)
+
+↓
+
+Services (Lógica de negocio)
+
+↓
+
+DTOs + Mappers (Transformación de datos)
+
+↓
+
+Models (Dominio)
+
+↓
+
+HTTP Service (Comunicación con API)
+
+```
+
+  
+
+### Flujo de Datos
+
+  
+
+1.  **Component** solicita datos al **Service**
+
+2.  **Service** llama al backend vía HTTP
+
+3. Backend responde con **DTOs**
+
+4.  **Mappers** transforman DTOs a **Models**
+
+5.  **Models** se usan en los componentes
+
+  
+
+## 📦 Módulos Implementados
+
+  
+
+### 1. Módulo de Unidades (Vehículos)
+
+- ✅ CRUD completo de unidades
+
+- ✅ Listado
+
+- ✅ Activación/Desactivación de unidades
+
+  
+
+### 2. Módulo de Rutas
+
+- ✅ Gestión de rutas
+
+- ✅ Asignación de rutas a unidades
+
+- ✅ Cambio de estado (Assigned → In Progress → Completed)
+
+- ✅ Registro de métricas al completar
+
+- ✅ Filtros por estado y unidad
+
+  
+
+### 3. Módulo de Rendimiento
+
+- ✅ Visualización de métricas de rendimiento
+
+  
+  
+
+### 4. Módulo de Usuarios (Heredado)
+
+- ✅ Nuevo CRUD generado
+
+  
+
+## 🛠️ Scripts Disponibles
+
+  
+
+### Desarrollo
+
+  
+
 ```bash
-npm install
+
+# Iniciar servidor de desarrollo
+
+npm  start
+
+# o
+
+ng  serve
+
+  
+
+# Servidor con puerto personalizado
+
+ng  serve  --port  4300
+
+  
+
+# Abrir automáticamente en el navegador
+
+ng  serve  --open
+
 ```
 
-2. Ejecutar la aplicación:
+  
+
+## 🔧 Configuración del Backend
+
+  
+
+### Archivo: `src/environments/environment.ts`
+
+  
+
+```typescript
+
+export  const  environment = {
+
+production:  false,
+
+apiUrl:  'http://localhost:8000'
+
+};
+
+```
+
+  
+  
+
+## 🌐 Conexión con el Backend
+
+  
+
+### Prerequisito: Backend en ejecución
+
+  
+
+Asegúrate de que el backend de IntegriApp esté corriendo:
+
+  
+
 ```bash
-npm start
+
+# En el directorio del backend
+
+docker-compose  up  -d
+
+  
+
+# Verificar que esté corriendo
+
+curl  http://localhost:8000/health
+
 ```
 
-3. Abrir en el navegador:
+  
+
+## 🐛 Troubleshooting
+
+  
+
+### Error: "Cannot connect to backend"
+
+  
+
+**Solución:**
+
+1. Verifica que el backend esté corriendo: `curl http://localhost:8000/health`
+
+2. Revisa la URL en `src/environments/environment.ts`
+
+3. Verifica la configuración de CORS en el backend
+
+  
+
+### Error: "Module not found"
+
+  
+
+**Solución:**
+
+```bash
+
+# Eliminar node_modules y reinstalar
+
+rm  -rf  node_modules  package-lock.json
+
+npm  install
+
 ```
-http://localhost:4200
+
+  
+
+### El servidor no se inicia
+
+  
+
+**Solución:**
+
+```bash
+
+# Verificar que no haya otro proceso en el puerto 4200
+
+lsof  -ti:4200 | xargs  kill  -9
+
+  
+
+# Limpiar caché de Angular
+
+ng  cache  clean
+
+  
+
+# Reintentar
+
+npm  start
+
 ```
 
-## Uso
+  
 
-### Módulo de Usuarios
+### Cambios no se reflejan en el navegador
 
-- **Crear Usuario**: Navegar a Usuarios → "Nuevo Usuario"
-- **Editar Usuario**: Hacer clic en "Editar" en la lista de usuarios
-- **Eliminar Usuario**: Hacer clic en "Eliminar" en la lista de usuarios
+  
 
-### Módulo de Unidades
+**Solución:**
 
-- **Crear Unidad**: Navegar a Unidades → "Nueva Unidad"
-  - Debe seleccionar un usuario existente para asignar a la unidad
-- **Editar Unidad**: Hacer clic en "Editar" en la lista de unidades
-- **Eliminar Unidad**: Hacer clic en "Eliminar" en la lista de unidades
+1. Limpia la caché del navegador (Ctrl/Cmd + Shift + R)
 
-## Tecnologías
+2. Verifica que el servidor esté en modo watch
 
-- Angular 17
-- TypeScript
-- RxJS
-- Reactive Forms
-- Routing con lazy loading
+3. Revisa la consola del navegador por errores
 
-## Notas
+  
 
-- Los datos se almacenan en memoria (no hay backend)
-- La aplicación incluye datos de ejemplo al iniciar
-- Es necesario crear usuarios antes de asignarlos a unidades
+### Error: "ng: command not found"
+
+  
+
+**Solución:**
+
+```bash
+
+# Instalar Angular CLI globalmente
+
+npm  install  -g  @angular/cli
+
+  
+
+# O usar npx
+
+npx  ng  serve
+
+```
+
+  
+
+## 📚 Documentación Adicional
+
+  
+
+- [Angular Documentation](https://angular.io/docs)
+
+- [TypeScript Documentation](https://www.typescriptlang.org/docs/)
+
+- [RxJS Documentation](https://rxjs.dev/)
+
+
+  
+
+## 📊 Tecnologías Utilizadas
+
+  
+
+-  **Framework:** Angular 17+
+
+-  **Lenguaje:** TypeScript 5+
+
+-  **Estado:** RxJS
+
+-  **HTTP Client:** Angular HttpClient
+
+-  **Routing:** Angular Router
+
+-  **Formularios:** Reactive Forms
+
+-  **Estilos:** CSS3 / SCSS
+
+  
+
+## 📝 Notas Importantes
+
+  
+
+- 🔄 **Hot Reload:** Los cambios se reflejan automáticamente en desarrollo
+
+- 🎯 **TypeScript:** Aprovecha el tipado fuerte para evitar errores
+
+- 📦 **Modularidad:** Cada funcionalidad está en su propio módulo
+
+- 🗺️ **Mappers:** Separan la lógica de transformación de datos
+
+- 🔌 **Servicios:** Centralizan la comunicación con el backend
+
+  
+  
+
+## 🎯 Flujo de Trabajo Típico
+
+  
+
+### 1. Gestión de Unidades
+
+```
+
+Login → Unidades → Crear/Editar Unidad → Guardar
+
+```
+
+  
+
+### 2. Asignación de Rutas
+
+```
+
+Rutas → Crear Ruta → Asignar a Unidad → Iniciar Ruta → Completar Ruta
+
+```
+
+  
+
+### 3. Análisis de Rendimiento
+
+```
+
+Rendimiento → Seleccionar Unidad/Ruta → Ver Métricas → Exportar Reporte
+
+```
+
+  
+  
+
+### Desarrollado por Oscar Omar Arias Rodríguez 🐻
